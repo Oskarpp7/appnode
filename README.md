@@ -1,31 +1,57 @@
-# 🏫 Sistema de Gestió Escolar - Node.js
+# 🏫 Sistema de Gestió Escolar Multi-tenant
 
-Sistema web complet de gestió de serveis escolars multi-tenant desenvolupat amb Node.js i Vue.js.
+Un sistema integral de gestió escolar desenvolupat amb Node.js i Vue.js, dissenyat per suportar múltiples centres educatius (multi-tenant) amb funcionalitats completes per a la gestió d'estudiants, famílies, serveis i facturació.
 
-## 📋 Característiques
+## ✅ ESTAT ACTUAL: TOTALMENT OPERATIU
 
-- **Multi-tenant**: Suport per múltiples centres educatius
-- **Gestió d'usuaris**: Famílies, monitors, admins del centre i super admins
-- **Assistència**: Registre i seguiment d'assistència
-- **Temps real**: Notificacions instantànies amb Socket.IO
-- **Responsive**: Interfície optimitzada per tots els dispositius
-- **Segur**: Autenticació JWT i aïllament de dades per tenant
+- **Backend API**: ✅ Funcionant al port 3000
+- **Frontend Vue**: ✅ Funcionant al port 5173 (ESTABILITZAT)
+- **Autenticació multi-tenant**: ✅ Implementada i testejada
+- **Dashboards per rol**: ✅ 5 dashboards únics creats
+- **Demo data**: ✅ Tenant 'escola-demo' amb usuaris de prova
+
+## 🚀 Característiques Principals
+
+### 🔐 Autenticació i Autorització ✅ IMPLEMENTADA
+- Sistema multi-tenant amb identificació per slug
+- Autenticació JWT amb tokens segurs
+- Rols d'usuari: SUPER_ADMIN, ADMIN_CENTRE, COORDINADOR, MONITOR, FAMILIA
+- ✅ **IMPLEMENTAT**: Suport per X-Tenant-Slug header i case-insensitive search
+- ✅ **IMPLEMENTAT**: Middleware de protecció de rutes amb guards per rol
+
+### 👨‍👩‍👧‍👦 Gestió d'Usuaris ✅ OPERATIVA
+- Registre i gestió de famílies
+- Administració del personal del centre
+- Perfils d'usuari personalitzables
+- Sistema de permisos per rols
+- ✅ **6 usuaris de prova** creats amb diferents rols
+
+### 🎨 Dashboards per Rol ✅ IMPLEMENTATS
+- **SUPER_ADMIN** → `/superadmin` (Gestió multi-tenant, colors porpra)
+- **ADMIN_CENTRE** → `/admin` (Administració centre, colors blaus)
+- **COORDINADOR** → `/coordinador` (Coordinació activitats, colors verds)
+- **MONITOR** → `/monitor` (Gestió estudiants, colors taronja)
+- **FAMILIA** → `/familia` (Portal famílies, colors rosa)
+- ✅ **Router amb guards automàtics** i redireccions basades en rol
 
 ## 🚀 Stack Tecnològic
 
-### Backend
-- **Node.js** 18+ amb Express.js
-- **Base de dades**: SQLite (dev) / MySQL (prod)
-- **ORM**: Sequelize
-- **Autenticació**: JWT + bcryptjs
-- **Temps real**: Socket.IO
+### Backend ✅ OPERATIU
+- **Node.js** - Runtime de JavaScript
+- **Express.js** - Framework web (port 3000)
+- **Sequelize** - ORM per base de dades
+- **SQLite** - Base de dades ✅ amb demo data
+- **JWT** - Autenticació ✅ amb X-Tenant-Slug header
+- **Socket.IO** - Comunicació en temps real ✅ amb CORS
+- **CORS** - ✅ Configurat per localhost:5173 amb credentials
 
-### Frontend
-- **Vue.js 3** amb Composition API
-- **Router**: Vue Router 4
-- **State**: Pinia
-- **Styling**: Tailwind CSS
-- **Build**: Vite
+### Frontend ✅ ESTABILITZAT
+- **Vue.js 3** - Framework progressiu
+- **Vue Router** - Navegació SPA ✅ amb guards per rol
+- **Pinia** - Gestió d'estat ✅ amb auth store
+- **Vite** - ✅ **ESTABILITZAT** (strictPort: true, port 5173)
+- **Tailwind CSS** - Framework CSS ✅ amb colors per rol
+- **Axios** - Client HTTP ✅ amb tenant headers
 
 ## 🏗️ Estructura del Projecte
 
