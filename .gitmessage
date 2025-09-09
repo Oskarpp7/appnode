@@ -1,0 +1,20 @@
+# Tipus(àmbit): descripció breu (màx 50 chars)
+# Descripció detallada (opcional, wrapping a 72 chars)
+# Explica QUÈ i PER QUÈ, no COM
+# Tipus:
+# feat:     Nova funcionalitat
+# fix:      Correcció bug
+# docs:     Documentació
+# style:    Formatació, semicolons, etc (no canvis funcionals)
+# refactor: Refactoring codi
+# test:     Afegir tests
+# chore:    Manteniment (dependencies, build, etc)
+# Exemples:
+# feat(auth): afegir login amb JWT
+# fix(dashboard): corregir càrrega dades família
+# docs(api): actualitzar documentació endpoints
+# style(lint): aplicar ESLint rules
+# refactor(models): simplificar associacions Sequelize
+# test(family): afegir tests dashboard família
+# chore(deps): actualitzar dependencies seguretat
+# Breaking changes: afegir BREAKING CHANGE: al footer
