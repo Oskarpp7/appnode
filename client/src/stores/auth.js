@@ -25,7 +25,9 @@ export const useAuthStore = defineStore('auth', {
     isLoggedIn: (state) => !!state.token && !!state.user,
     isFamily: (state) => state.user?.role === 'FAMILIA',
     userName: (state) => state.user?.name || '',
-    tenantSlug: () => 'escola-europa-demo' // Per ara hardcoded, després serà dinàmic
+    tenantSlug: () => 'escola-demo', // Demo tenant from seed data
+    hasRole: (state) => (role) => state.user?.role === role,
+    userRole: (state) => state.user?.role || null
   },
 
   actions: {
@@ -36,10 +38,10 @@ export const useAuthStore = defineStore('auth', {
       try {
         const response = await api.post('/auth/login', {
           ...credentials,
-          tenant_slug: 'escola-europa-demo'  // Inclou tenant_slug al body
+          tenant_slug: 'escola-demo'  // Inclou tenant_slug al body
         }, {
           headers: {
-            'X-Tenant-Slug': 'escola-europa-demo'  // També al header
+            'X-Tenant-Slug': 'escola-demo'  // També al header
           }
         })
 
@@ -53,7 +55,7 @@ export const useAuthStore = defineStore('auth', {
         
           // Configurar axios per futures requests
           api.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
-          api.defaults.headers.common['X-Tenant-Slug'] = 'escola-europa-demo'
+          api.defaults.headers.common['X-Tenant-Slug'] = 'escola-demo'
           
           return { success: true }
         } else {
@@ -84,7 +86,7 @@ export const useAuthStore = defineStore('auth', {
           api.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
           const response = await api.get('/auth/me', {
             headers: {
-              'X-Tenant-Slug': 'escola-europa-demo'
+              'X-Tenant-Slug': 'escola-demo'
             }
           })
           

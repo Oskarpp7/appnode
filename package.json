@@ -14,7 +14,8 @@
     "lint": "eslint . --ext .js,.vue",
     "lint:fix": "eslint . --ext .js,.vue --fix",
     "db:migrate": "npx sequelize-cli db:migrate",
-    "db:seed": "npx sequelize-cli db:seed:all",
+    "db:seed": "node seed.js",
+    "db:reseed": "node seed.js",
     "db:reset": "npx sequelize-cli db:migrate:undo:all && npm run db:migrate && npm run db:seed",
     "setup": "npm install && cd client && npm install"
   },
