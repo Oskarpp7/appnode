@@ -32,7 +32,7 @@ if (process.env.NODE_ENV === 'production') {
   sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: process.env.DB_STORAGE || 'database.sqlite',
-    logging: false, // Desactivem els logs SQL per fer-ho més net 
+    logging: console.log, // Activem els logs SQL per debugging 
     define: {
       timestamps: true,
       underscored: true,

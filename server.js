@@ -14,33 +14,13 @@ const apiRoutes = require('./routes/api');
 const app = express();
 const server = createServer(app);
 
-// CORS Configuration - CRÍTICA PER FUNCIONAMENT
-const corsOptions = {
-  origin: [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:8080',
-    'http://127.0.0.1:8080',
-    process.env.FRONTEND_URL || 'http://localhost:5173'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Tenant-Slug',  // ← AQUEST ÉS EL CRÍTICO!
-    'Accept',
-    'Origin',
-    'X-Requested-With'
-  ],
-  exposedHeaders: ['Authorization'],
-  optionsSuccessStatus: 200,
-  preflightContinue: false
-};
-
 // Configurar Socket.IO
 const io = new Server(server, {
-  cors: corsOptions
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
 });
 
 // Middleware de seguretat i configuració
@@ -56,21 +36,12 @@ app.use(helmet({
   },
 }));
 
-app.use(cors(corsOptions));
-
-// Middleware CORS addicional per assegurar headers correctes
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Tenant-Slug');
-  
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant-Slug', 'Accept', 'Origin', 'X-Requested-With']
+}));
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
@@ -210,17 +181,28 @@ const startServer = async () => {
     
     // Sincronitzar models (només en desenvolupament)
     if (process.env.NODE_ENV === 'development') {
-      await syncDatabase({ alter: true });
+      await syncDatabase(); // sense { alter: true }
       console.log('✅ Models de base de dades sincronitzats');
     }
     
-    // Iniciar servidor
-    const PORT = process.env.PORT || 3000;
-    server.listen(PORT, () => {
+    // Iniciar servidor amb gestió robusta de ports
+    const PORT = Number(process.env.PORT || 3000);
+    
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} in use, aborting`);
+        process.exit(1);
+      } else {
+        console.error('❌ Server error:', err);
+        process.exit(1);
+      }
+    });
+
+    server.listen(PORT, '0.0.0.0', () => {
       console.log('🚀 ========================================');
       console.log('🏫 SISTEMA GESTIÓ ESCOLAR - NODE.JS');
       console.log('🚀 ========================================');
-      console.log(`✅ Servidor funcionant al port ${PORT}`);
+      console.log(`✅ API listening on ${PORT}`);
       console.log(`🌐 URL: http://localhost:${PORT}`);
       console.log(`🏥 Health: http://localhost:${PORT}/health`);
       console.log(`📡 API: http://localhost:${PORT}/api`);

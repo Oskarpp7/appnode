@@ -1,5 +1,4 @@
 const { generateToken } = require('../config/jwt');
-const { User, Tenant } = require('../models');
 const Joi = require('joi');
 
 // Esquemes de validació
@@ -39,88 +38,135 @@ const registerSchema = Joi.object({
   })
 });
 
+// Imports per login
+const { User, Tenant } = require('../models');
+const { Op, sequelize } = require('sequelize');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 /**
  * Login d'usuari
  */
 const login = async (req, res) => {
   try {
-    // Validar input
-    const { error, value } = loginSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: 'Dades invàlides',
-        errors: error.details.map(detail => detail.message)
+    const { email, password, tenant_slug } = req.body;
+    const tenantSlugFromHeader = req.headers['x-tenant-slug'];
+    
+    // LOG DETALLAT per debugging
+    console.log('🔐 LOGIN ATTEMPT:', {
+      email,
+      tenant_slug,
+      tenantSlugFromHeader,
+      body: req.body,
+      headers: req.headers
+    });
+    
+    // Tenant requerit
+    const finalTenantSlug = tenant_slug || tenantSlugFromHeader;
+    if (!finalTenantSlug) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Tenant slug requerido' 
       });
     }
-
-    const { email, password, tenant_slug } = value;
-
-    // Buscar usuari amb el tenant
-    let whereClause = { email, active: true };
-    let tenantWhere = { status: 'active' };
-
-    if (tenant_slug) {
-      tenantWhere.slug = tenant_slug;
+    
+    console.log('🏢 TENANT SLUG A USAR:', finalTenantSlug);
+    
+    // Buscar tenant case-insensitive compatible SQLite
+    const tenant = await Tenant.findOne({
+      where: {
+        slug: { [Op.like]: finalTenantSlug },
+        status: 'active'
+      }
+    });
+    
+    console.log('🏢 TENANT TROBAT:', tenant ? tenant.name : 'NO TROBAT');
+    
+    if (!tenant) {
+      console.log('❌ TENANT NO EXISTEIX:', slugToUse);
+      return res.status(400).json({
+        success: false,
+        message: `Centre educatiu '${slugToUse}' no trobat`
+      });
     }
-
+    
+    // Buscar usuari amb include per evitar joins manuals
     const user = await User.findOne({
-      where: whereClause,
+      where: { 
+        email: email, 
+        active: true 
+      },
       include: [{
         model: Tenant,
         as: 'tenant',
-        where: tenantWhere
+        where: { 
+          status: 'active', 
+          slug: { [Op.like]: finalTenantSlug } 
+        }
       }]
     });
-
+    
+    console.log('👤 USUARI TROBAT:', user ? user.name : 'NO TROBAT');
+    
     if (!user) {
+      console.log('❌ USUARI NO EXISTEIX:', email, 'al tenant:', tenant.name);
       return res.status(401).json({
         success: false,
-        message: 'Credencials invàlides o centre educatiu no trobat'
+        message: 'Credencials invàlides o usuari no pertany a aquest centre'
       });
     }
-
-    // Verificar contrasenya
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
+    
+    // Verificar password
+    const validPassword = await bcrypt.compare(password, user.password);
+    console.log('🔑 PASSWORD VÀLID:', validPassword);
+    
+    if (!validPassword) {
+      console.log('❌ PASSWORD INCORRECTE per usuari:', user.email);
       return res.status(401).json({
         success: false,
-        message: 'Credencials invàlides'
+        message: 'Contrasenya incorrecta'
       });
     }
-
-    // Generar token JWT
-    const token = generateToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-      tenant_id: user.tenant_id
-    });
-
-    // Actualitzar last_login
-    await user.update({ last_login: new Date() });
-
-    // Resposta d'èxit
+    
+    // Generar JWT
+    const token = jwt.sign(
+      { 
+        userId: user.id,
+        tenantId: tenant.id,
+        role: user.role,
+        email: user.email
+      },
+      process.env.JWT_SECRET || 'secret-key',
+      { expiresIn: '24h' }
+    );
+    
+    console.log('✅ LOGIN EXITÓS:', user.email);
+    
     res.json({
       success: true,
       message: 'Login exitós',
       data: {
         token,
-        user: user.toSafeObject(),
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        },
         tenant: {
-          id: user.tenant.id,
-          name: user.tenant.name,
-          slug: user.tenant.slug,
-          settings: user.tenant.settings
+          id: tenant.id,
+          name: tenant.name,
+          slug: tenant.slug
         }
       }
     });
-
+    
   } catch (error) {
-    console.error('❌ Login error:', error);
+    console.error('💥 ERROR LOGIN:', error);
     res.status(500).json({
       success: false,
-      message: 'Error intern del servidor'
+      message: 'Error intern del servidor',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -214,13 +260,8 @@ const register = async (req, res) => {
  */
 const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
-      include: [{
-        model: Tenant,
-        as: 'tenant',
-        attributes: ['id', 'name', 'slug', 'settings']
-      }]
-    });
+    const user = await User.findByPk(req.user.userId);
+    const tenant = await Tenant.findByPk(req.user.tenantId);
 
     if (!user) {
       return res.status(404).json({
@@ -232,8 +273,17 @@ const getCurrentUser = async (req, res) => {
     res.json({
       success: true,
       data: {
-        user: user.toSafeObject(),
-        tenant: user.tenant
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        },
+        tenant: {
+          id: tenant.id,
+          name: tenant.name,
+          slug: tenant.slug
+        }
       }
     });
 
@@ -292,51 +342,10 @@ const refreshToken = async (req, res) => {
   }
 };
 
-// Endpoint per verificar l'usuari actual (middleware de verificació de token)
-const me = async (req, res) => {
-  try {
-    // L'usuari ja està disponible gràcies al middleware d'autenticació
-    const user = await User.findByPk(req.user.id, {
-      where: { tenant_id: req.user.tenant_id },
-      attributes: ['id', 'name', 'email', 'role', 'phone', 'profile_data', 'last_login']
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'Usuari no trobat'
-      });
-    }
-
-    res.json({
-      success: true,
-      data: {
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          phone: user.phone,
-          profile_data: user.profile_data,
-          last_login: user.last_login
-        }
-      },
-      message: 'Usuari verificat correctament'
-    });
-  } catch (error) {
-    console.error('Error verificant usuari:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error intern del servidor'
-    });
-  }
-};
-
 module.exports = {
   login,
   register,
   getCurrentUser,
   logout,
-  refreshToken,
-  me
+  refreshToken
 };

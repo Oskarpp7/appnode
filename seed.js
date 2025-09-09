@@ -96,6 +96,12 @@ const seedDatabase = async () => {
     ]);
 
     console.log('✅ Usuaris creats:', users.length);
+    
+    // DEBUG: Verificar que els usuaris s'han creat correctament
+    console.log('🔍 DEBUG: Verificant usuaris creats...');
+    for (const user of users) {
+      console.log(`   - ${user.name} (${user.email}) - Tenant: ${user.tenant_id}`);
+    }
 
     // Crear estudiants de prova
     const students = await Promise.all([

@@ -4,8 +4,7 @@ const {
   register, 
   getCurrentUser, 
   logout, 
-  refreshToken,
-  me 
+  refreshToken 
 } = require('../controllers/authController');
 const { authenticateToken } = require('../middleware/auth');
 
@@ -16,7 +15,7 @@ router.post('/login', login);
 router.post('/register', register);
 
 // Routes protegides
-router.get('/me', authenticateToken, me);
+router.get('/me', authenticateToken, getCurrentUser);
 router.post('/logout', authenticateToken, logout);
 router.post('/refresh', authenticateToken, refreshToken);
 

@@ -14,7 +14,11 @@ const syncDatabase = async (options = {}) => {
   try {
     console.log('🔄 Sincronitzant base de dades...');
     
-    await sequelize.sync(options);
+    // Forçar a NO usar alter en dev per evitar _backup en SQLite
+    const safeOptions = (process.env.DB_SYNC === 'force') ? { force: true } :
+                        (process.env.DB_SYNC === 'alter') ? { alter: { drop: false } } : {};
+    
+    await sequelize.sync(safeOptions);
     
     console.log('✅ Base de dades sincronitzada correctament');
   } catch (error) {
