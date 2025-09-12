@@ -206,11 +206,11 @@
         <div class="mt-8">
           <h3 class="text-lg font-medium text-gray-900 mb-4">Accions Ràpides</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <router-link to="/test" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium text-center">
-              Afegir Estudiant
-            </router-link>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+              Afegir Usuari
+            </button>
             <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-              Nou Usuari
+              Nou Estudiant
             </button>
             <button class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md text-sm font-medium">
               Generar Informe
@@ -226,5 +226,5 @@
 </template>
 
 <script setup>
-// No dependencies needed for this version
+// No dependencies needed for this simple version
 </script>

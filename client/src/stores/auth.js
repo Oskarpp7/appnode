@@ -2,23 +2,10 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '@/router'
 
-// Configuració API baseURL dinàmic per connexions IP locals
-const getApiBaseUrl = () => {
-  const currentHost = window.location.hostname
-  const currentPort = window.location.port || '5173'
-  
-  // Si estem en IP local, usar port 3000 del mateix host
-  if (currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
-    return `http://${currentHost}:3000/api`
-  }
-  return 'http://localhost:3000/api'
-}
-
-// Configurar axios base amb URL dinàmic
+// Configurar axios base
 const api = axios.create({
-  baseURL: getApiBaseUrl(),
-  withCredentials: true,
-  timeout: 15000,
+  baseURL: 'http://localhost:3000/api',
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -96,7 +83,10 @@ export const useAuthStore = defineStore('auth', {
     
     // NOVA FUNCIÓ PER REDIRIGIR SEGONS ROL
     redirectUserByRole() {
-      if (!this.user) return
+      if (!this.user) {
+        console.log('❌ NO HI HA USUARI PER REDIRECCIONAR')
+        return
+      }
       
       const roleRedirects = {
         'SUPER_ADMIN': '/superadmin',
@@ -110,7 +100,17 @@ export const useAuthStore = defineStore('auth', {
       
       if (redirectTo) {
         console.log(`🎯 REDIRIGINT ${this.user.role} A:`, redirectTo)
-        router.push(redirectTo)
+        
+        // Utilitzar setTimeout per assegurar que el DOM està actualitzat
+        setTimeout(() => {
+          router.push(redirectTo).then(() => {
+            console.log('✅ REDIRECCIÓ COMPLETADA A:', redirectTo)
+          }).catch((error) => {
+            console.error('❌ ERROR EN REDIRECCIÓ:', error)
+            // Si falla, forçar reload de la pàgina
+            window.location.href = redirectTo
+          })
+        }, 100)
       } else {
         console.log('⚠️ ROL DESCONEGUT:', this.user.role)
         router.push('/unauthorized')
