@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+      - "3001:3001"  # WebSockets port
+    environment:
+      - NODE_ENV=development
+      - DB_FILE=/app/data/database.sqlite
+      - WEBSOCKET_ENABLED=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - db_data:/app/data
+    depends_on:
+      - redis
+  
+  frontend:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - VITE_WS_URL=ws://localhost:3001
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  # Redis per WebSockets i cache (Phase 2)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  # Base de dades backup (opcional)
+  backup:
+    image: alpine:latest
+    volumes:
+      - db_data:/data
+      - ./backups:/backups
+    command: >
+      sh -c "
+        while true; do
+          tar -czf /backups/db_backup_$$(date +%Y%m%d_%H%M%S).tar.gz -C /data .
+          find /backups -name 'db_backup_*.tar.gz' -mtime +7 -delete
+          sleep 3600
+        done
+      "
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+  redis_data:
