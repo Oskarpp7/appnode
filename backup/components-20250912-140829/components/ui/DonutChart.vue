@@ -51,15 +51,12 @@ export default {
   props: {
     title: {
       type: String,
-      default: ''
+      required: true
     },
     data: {
       type: Object,
-      default: () => ({ labels: [], values: [] })
-    },
-    centerValue: {
-      type: [Object, Number, String],
-      default: () => ({ value: '', label: '' })
+      required: true,
+      validator: (data) => data.labels && data.datasets
     },
     variant: {
       type: String,

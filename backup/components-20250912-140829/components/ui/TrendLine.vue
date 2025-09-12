@@ -44,18 +44,19 @@ export default {
   props: {
     title: {
       type: String,
-      default: ''
+      required: true
     },
     data: {
       type: Object,
-      default: () => ({ labels: [], values: [] })
+      required: true,
+      validator: (data) => data.labels && data.datasets
     },
     variant: {
       type: String,
       default: 'default'
     },
     height: {
-      type: [Number, String],
+      type: Number,
       default: 300
     },
     showPeriodSelector: {

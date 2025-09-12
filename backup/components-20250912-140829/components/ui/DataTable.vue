@@ -7,28 +7,28 @@
         <div class="flex items-center space-x-3">
           <!-- Search -->
           <div v-if="searchable" class="relative">
-            props: {
-              title: {
-                type: String,
-                default: ''
-              },
-              columns: {
-                type: Array,
-                default: () => []
-              },
-              rows: {
-                type: Array,
-                default: () => []
-              },
-              data: {
-                type: Array,
-                default: () => []
-              },
-              searchable: {
-                type: Boolean,
-                default: false
-              }
-            },
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Cercar..."
+              class="pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+            <MagnifyingGlassIcon class="absolute left-2.5 top-2 h-4 w-4 text-gray-400" />
+          </div>
+          
+          <!-- Actions slot -->
+          <slot name="actions" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <!-- Header -->
+        <thead class="bg-gray-50 sticky top-0">
+          <tr>
+            <th
               v-for="column in columns"
               :key="column.key"
               @click="column.sortable ? toggleSort(column.key) : null"
@@ -51,106 +51,87 @@
                   <ChevronUpDownIcon 
                     v-else
                     class="h-4 w-4 text-gray-300"
-                  <template>
-                    <div class="data-table-container">
-                      <div v-if="title" class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold">{{ title }}</h3>
-                      </div>
-                      <div v-if="searchEnabled" class="px-6 py-4 border-b border-gray-200">
-                        <input
-                          v-model="searchTerm"
-                          type="text"
-                          placeholder="Cercar..."
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                      </div>
-                      <div class="overflow-x-auto">
-                        <table class="min-w-full">
-                          <thead class="bg-gray-50">
-                            <tr>
-                              <th
-                                v-for="column in columns"
-                                :key="column.key"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                              >
-                                {{ column.label }}
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="(row, index) in filteredData" :key="index" class="hover:bg-gray-50">
-                              <td
-                                v-for="column in columns"
-                                :key="column.key"
-                                class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                              >
-                                <span v-if="column.badge" :class="`px-2 py-1 text-xs rounded-full ${getBadgeClass(row[column.key])}`">
-                                  {{ row[column.key] }}
-                                </span>
-                                <span v-else>{{ row[column.key] }}</span>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                  />
+                </template>
+              </div>
+            </th>
+          </tr>
+        </thead>
+
+        <!-- Body -->
+        <tbody class="bg-white divide-y divide-gray-200">
+          <!-- Loading skeleton -->
+          <tr v-if="loading" v-for="n in 5" :key="'skeleton-' + n">
+            <td v-for="column in columns" :key="column.key" class="px-6 py-4">
+              <div class="animate-pulse">
+                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Data rows -->
+          <tr
+            v-else
+            v-for="(row, index) in paginatedData"
+            :key="getRowKey(row, index)"
+            class="hover:bg-gray-50 transition-colors"
+          >
+            <td
+              v-for="column in columns"
+              :key="column.key"
+              class="px-6 py-4 whitespace-nowrap"
+            >
+              <slot 
+                :name="'cell-' + column.key" 
+                :row="row" 
+                :value="getNestedValue(row, column.key)"
+                :index="index"
+              >
+                <div v-if="column.type === 'badge'" class="inline-flex">
+                  <span :class="getBadgeClasses(getNestedValue(row, column.key), column.badgeConfig)">
+                    {{ formatCellValue(getNestedValue(row, column.key), column) }}
+                  </span>
+                </div>
+                <div v-else-if="column.type === 'progress'" class="w-full">
+                  <div class="flex items-center">
+                    <div class="flex-1">
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          :class="getProgressClasses(column)"
+                          class="h-2 rounded-full transition-all duration-300"
+                          :style="{ width: getNestedValue(row, column.key) + '%' }"
+                        ></div>
                       </div>
                     </div>
-                  </template>
+                    <span class="ml-2 text-sm text-gray-600">
+                      {{ getNestedValue(row, column.key) }}%
+                    </span>
+                  </div>
+                </div>
+                <span v-else :class="getCellClasses(column)">
+                  {{ formatCellValue(getNestedValue(row, column.key), column) }}
+                </span>
+              </slot>
+            </td>
+          </tr>
 
-                  <script setup>
-                  import { ref, computed } from 'vue'
+          <!-- Empty state -->
+          <tr v-if="!loading && filteredData.length === 0">
+            <td :colspan="columns.length" class="px-6 py-12 text-center">
+              <div class="text-gray-500">
+                <ExclamationCircleIcon class="mx-auto h-12 w-12 text-gray-400 mb-2" />
+                <p class="text-sm">{{ emptyMessage }}</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-                  const props = defineProps({
-                    title: {
-                      type: String,
-                      default: ''
-                    },
-                    data: {
-                      type: Array,
-                      default: () => []
-                    },
-                    rows: {
-                      type: Array,
-                      default: () => []
-                    },
-                    columns: {
-                      type: Array,
-                      required: true,
-                      default: () => []
-                    },
-                    searchEnabled: {
-                      type: Boolean,
-                      default: false
-                    }
-                  })
-
-                  const tableData = computed(() => {
-                    return props.data.length > 0 ? props.data : props.rows
-                  })
-
-                  const searchTerm = ref('')
-
-                  const filteredData = computed(() => {
-                    let filtered = tableData.value
-                    if (searchTerm.value && props.searchEnabled) {
-                      filtered = filtered.filter(row =>
-                        Object.values(row).some(value =>
-                          String(value).toLowerCase().includes(searchTerm.value.toLowerCase())
-                        )
-                      )
-                    }
-                    return filtered.slice(0, 100)
-                  })
-
-                  const getBadgeClass = (value) => {
-                    const badgeClasses = {
-                      'Actiu': 'bg-green-100 text-green-800',
-                      'Inactiu': 'bg-red-100 text-red-800',
-                      'Pendent': 'bg-yellow-100 text-yellow-800',
-                      'Completat': 'bg-blue-100 text-blue-800'
-                    }
-                    return badgeClasses[value] || 'bg-gray-100 text-gray-800'
-                  }
-                  </script>
+    <!-- Pagination -->
+    <div v-if="paginated && totalPages > 1" class="px-6 py-3 border-t border-gray-200">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-500">
           Mostrant {{ ((currentPage - 1) * itemsPerPage) + 1 }} a 
           {{ Math.min(currentPage * itemsPerPage, filteredData.length) }} de 
           {{ filteredData.length }} resultats
