@@ -56,9 +56,36 @@
         
         <div class="text-xs text-gray-500 bg-gray-100 p-3 rounded">
           <p class="font-medium">Credencials de prova:</p>
-          <p><strong>Família Anna:</strong> anna.garcia@email.com / familia123</p>
-          <p><strong>Admin:</strong> admin@escola-demo.com / admin123</p>
-          <p><strong>Monitor:</strong> monitor@escola-demo.com / monitor123</p>
+          <p><strong>Super Admin:</strong> admin@gestioescolar.com / password123</p>
+          <p><strong>Admin Centre:</strong> admin@edutech.com / password123</p>
+          <p><strong>Coordinador:</strong> coordinador@edutech.com / password123</p>
+          <p><strong>Monitor:</strong> monitor@edutech.com / password123</p>
+          <p><strong>Família:</strong> familia@edutech.com / password123</p>
+        </div>
+        
+        <!-- Botons d'accés directe per debug -->
+        <div class="mt-4 space-y-2">
+          <h3 class="text-sm font-medium text-gray-700 text-center">🔧 Accés directe (desenvolupament)</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <router-link to="/admin" class="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-1 px-2 rounded text-center">
+              🏢 Admin Centre
+            </router-link>
+            <router-link to="/admin-simple" class="bg-blue-600 hover:bg-blue-800 text-white text-xs font-bold py-1 px-2 rounded text-center">
+              🏢 Admin Simple
+            </router-link>
+            <router-link to="/coordinador" class="bg-green-500 hover:bg-green-700 text-white text-xs font-bold py-1 px-2 rounded text-center">
+              📋 Coordinador
+            </router-link>
+            <router-link to="/monitor" class="bg-yellow-500 hover:bg-yellow-700 text-white text-xs font-bold py-1 px-2 rounded text-center">
+              👨‍🏫 Monitor
+            </router-link>
+            <router-link to="/familia" class="bg-purple-500 hover:bg-purple-700 text-white text-xs font-bold py-1 px-2 rounded text-center">
+              👨‍👩‍👧‍👦 Família
+            </router-link>
+            <router-link to="/test" class="bg-gray-500 hover:bg-gray-700 text-white text-xs font-bold py-1 px-2 rounded text-center">
+              🧪 Test Form
+            </router-link>
+          </div>
         </div>
       </form>
     </div>
