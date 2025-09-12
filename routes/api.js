@@ -1,6 +1,7 @@
 const express = require('express');
 const authRoutes = require('./auth');
-const familyRoutes = require('./family');
+const studentsRoutes = require('./students');
+const attendanceRoutes = require('./attendance');
 const { authenticateToken } = require('../middleware/auth');
 const { tenantIsolation } = require('../middleware/tenant');
 
@@ -12,9 +13,6 @@ router.use('/auth', authRoutes);
 // Middleware global per routes protegides
 router.use(authenticateToken);
 router.use(tenantIsolation);
-
-// Routes per famílies
-router.use('/family', familyRoutes);
 
 // Health check autenticat
 router.get('/health-auth', (req, res) => {
@@ -50,8 +48,12 @@ router.get('/tenant-info', (req, res) => {
 // Placeholder per futures routes
 // router.use('/family', familyRoutes);      // Dashboard família
 // router.use('/monitor', monitorRoutes);    // Dashboard monitor  
+// Routes de funcionalitats
+router.use('/students', studentsRoutes);   // Gestió estudiants avançada
+router.use('/attendance', attendanceRoutes); // Sistema d'assistència
+
+// TODO: Afegir més routes aquí quan siguin implementades
 // router.use('/admin', adminRoutes);        // Administració centre
-// router.use('/students', studentRoutes);   // Gestió estudiants
 // router.use('/attendance', attendanceRoutes); // Assistència
 
 // Error handler per routes no trobades

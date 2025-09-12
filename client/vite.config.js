@@ -11,10 +11,14 @@ export default defineConfig({
     }
   },
   server: {
-    host: '0.0.0.0',
+    host: 'localhost',   // Usar localhost per evitar problemes de WebSocket
     port: 5173,
     strictPort: true,
-    hmr: { host: 'localhost', port: 5173 },
+    cors: true,
+    hmr: {
+      port: 5173,
+      host: 'localhost'  // HMR també a localhost
+    },
     open: false
   },
   define: {

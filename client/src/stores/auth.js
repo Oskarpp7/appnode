@@ -2,10 +2,23 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '@/router'
 
-// Configurar axios base
+// Configuració API baseURL dinàmic per connexions IP locals
+const getApiBaseUrl = () => {
+  const currentHost = window.location.hostname
+  const currentPort = window.location.port || '5173'
+  
+  // Si estem en IP local, usar port 3000 del mateix host
+  if (currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+    return `http://${currentHost}:3000/api`
+  }
+  return 'http://localhost:3000/api'
+}
+
+// Configurar axios base amb URL dinàmic
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
-  timeout: 10000,
+  baseURL: getApiBaseUrl(),
+  withCredentials: true,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json'
   }

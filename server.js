@@ -7,7 +7,7 @@ const { Server } = require('socket.io');
 require('dotenv').config();
 
 // Importar configuració i routes
-const { sequelize, syncDatabase } = require('./models');
+const { sequelize } = require('./models');
 const apiRoutes = require('./routes/api');
 
 // Crear aplicació Express
@@ -36,12 +36,26 @@ app.use(helmet({
   },
 }));
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+// Configuració CORS ampliada per connexions IP locals
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://192.168.0.19:5173',     // IP local específica
+    /^http:\/\/192\.168\.0\.\d+:5173$/,  // Qualsevol IP 192.168.0.x
+    /^http:\/\/192\.168\.1\.\d+:5173$/,  // Qualsevol IP 192.168.1.x
+    /^http:\/\/10\.\d+\.\d+\.\d+:5173$/, // Xarxa 10.x.x.x
+    process.env.FRONTEND_URL || 'http://localhost:5173'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant-Slug', 'Accept', 'Origin', 'X-Requested-With']
-}));
+  allowedHeaders: [
+    'Content-Type', 'Authorization', 'X-Tenant-Slug', 
+    'Accept', 'Origin', 'X-Requested-With'
+  ]
+};
+
+app.use(cors(corsOptions));
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
@@ -181,7 +195,7 @@ const startServer = async () => {
     
     // Sincronitzar models (només en desenvolupament)
     if (process.env.NODE_ENV === 'development') {
-      await syncDatabase(); // sense { alter: true }
+      await sequelize.sync(); // sense { alter: true }
       console.log('✅ Models de base de dades sincronitzats');
     }
     

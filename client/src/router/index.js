@@ -3,11 +3,6 @@ import { useAuthStore } from '@/stores/auth'
 
 // Importar components
 import Login from '@/views/LoginView.vue'
-import SuperAdminDashboard from '@/views/dashboards/SuperAdminDashboard.vue'
-import AdminDashboard from '@/views/dashboards/AdminDashboard.vue'
-import CoordinadorDashboard from '@/views/dashboards/CoordinadorDashboard.vue'
-import MonitorDashboard from '@/views/dashboards/MonitorDashboard.vue'
-import FamiliaDashboard from '@/views/dashboards/FamiliaDashboard.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -28,51 +23,95 @@ const router = createRouter({
       component: () => import('@/views/TestView.vue')
     },
     
-    // DASHBOARDS ESPECÍFICS PER ROL
+    // Rutes del sistema d'assistència
+    {
+      path: '/attendance',
+      name: 'attendance',
+      component: () => import('@/views/AttendanceView.vue'),
+      meta: { requiresAuth: true, roles: ['admin', 'coordinador', 'monitor'] }
+    },
+    {
+      path: '/attendance/session/:sessionId',
+      name: 'attendance-session',
+      component: () => import('@/components/AttendanceTracker.vue'),
+      meta: { requiresAuth: true, roles: ['admin', 'coordinador', 'monitor'] }
+    },
+    
+    // DASHBOARDS ESPECÍFICS PER ROL - MODERNITZATS AMB LAYOUT
+    {
+      path: '/dashboard',
+      redirect: (to) => {
+        const authStore = useAuthStore()
+        const role = authStore.user?.role
+        const roleRoutes = {
+          'SUPER_ADMIN': '/superadmin',
+          'ADMIN_CENTRE': '/admin',
+          'COORDINADOR': '/coordinador',
+          'MONITOR': '/monitor',
+          'FAMILIA': '/familia'
+        }
+        return roleRoutes[role] || '/login'
+      }
+    },
     {
       path: '/superadmin',
-      name: 'superadmin-dashboard',
-      component: SuperAdminDashboard,
-      meta: { 
-        requiresAuth: true,
-        roles: ['SUPER_ADMIN']
-      }
+      component: () => import('@/components/layout/DashboardLayoutSimple.vue'),
+      meta: { requiresAuth: true, roles: ['SUPER_ADMIN'] },
+      children: [
+        {
+          path: '',
+          name: 'superadmin.dashboard',
+          component: () => import('@/views/dashboards/SuperAdminDashboardSimple.vue')
+        }
+      ]
     },
     {
       path: '/admin',
-      name: 'admin-dashboard', 
-      component: AdminDashboard,
-      meta: { 
-        requiresAuth: true,
-        roles: ['ADMIN_CENTRE', 'SUPER_ADMIN']
-      }
+      component: () => import('@/components/layout/DashboardLayoutSimple.vue'),
+      meta: { requiresAuth: true, roles: ['ADMIN_CENTRE', 'SUPER_ADMIN'] },
+      children: [
+        {
+          path: '',
+          name: 'admin.dashboard',
+          component: () => import('@/views/dashboards/AdminCentreDashboardSimple.vue')
+        }
+      ]
     },
     {
       path: '/coordinador',
-      name: 'coordinador-dashboard',
-      component: CoordinadorDashboard,
-      meta: { 
-        requiresAuth: true,
-        roles: ['COORDINADOR', 'ADMIN_CENTRE', 'SUPER_ADMIN']
-      }
+      component: () => import('@/components/layout/DashboardLayoutSimple.vue'),
+      meta: { requiresAuth: true, roles: ['COORDINADOR', 'ADMIN_CENTRE', 'SUPER_ADMIN'] },
+      children: [
+        {
+          path: '',
+          name: 'coordinador.dashboard',
+          component: () => import('@/views/dashboards/CoordinadorDashboardSimple.vue')
+        }
+      ]
     },
     {
       path: '/monitor',
-      name: 'monitor-dashboard',
-      component: MonitorDashboard,
-      meta: { 
-        requiresAuth: true,
-        roles: ['MONITOR', 'COORDINADOR', 'ADMIN_CENTRE', 'SUPER_ADMIN']
-      }
+      component: () => import('@/components/layout/DashboardLayoutSimple.vue'),
+      meta: { requiresAuth: true, roles: ['MONITOR', 'COORDINADOR', 'ADMIN_CENTRE', 'SUPER_ADMIN'] },
+      children: [
+        {
+          path: '',
+          name: 'monitor.dashboard',
+          component: () => import('@/views/dashboards/MonitorDashboardSimple.vue')
+        }
+      ]
     },
     {
       path: '/familia',
-      name: 'familia-dashboard',
-      component: FamiliaDashboard,
-      meta: { 
-        requiresAuth: true,
-        roles: ['FAMILIA']
-      }
+      component: () => import('@/components/layout/DashboardLayoutSimple.vue'),
+      meta: { requiresAuth: true, roles: ['FAMILIA'] },
+      children: [
+        {
+          path: '',
+          name: 'familia.dashboard',
+          component: () => import('@/views/dashboards/FamiliaDashboardSimple.vue')
+        }
+      ]
     },
     
     // Pàgina d'error per usuaris sense permisos

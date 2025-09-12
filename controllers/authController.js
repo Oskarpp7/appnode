@@ -83,10 +83,10 @@ const login = async (req, res) => {
     console.log('🏢 TENANT TROBAT:', tenant ? tenant.name : 'NO TROBAT');
     
     if (!tenant) {
-      console.log('❌ TENANT NO EXISTEIX:', slugToUse);
+      console.log('❌ TENANT NO EXISTEIX:', finalTenantSlug);
       return res.status(400).json({
         success: false,
-        message: `Centre educatiu '${slugToUse}' no trobat`
+        message: `Centre educatiu '${finalTenantSlug}' no trobat`
       });
     }
     
