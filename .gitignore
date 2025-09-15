@@ -133,3 +133,4 @@ sessions/
 build/
 node_modules
 node_modules
+scripts/fix-passwords.sh
