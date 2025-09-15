@@ -1,3 +1,4 @@
+import DashboardSuperAdminWireframe from '@/views/dashboards/DashboardSuperAdminWireframe.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
@@ -34,15 +35,24 @@ const router = createRouter({
     },
     
     // DASHBOARDS ESPECÍFICS PER ROL
-    {
-      path: '/superadmin',
-      name: 'superadmin-dashboard',
-      component: SuperAdminDashboard,
-      meta: { 
-        requiresAuth: true,
-        roles: ['SUPER_ADMIN']
-      }
-    },
+      {
+        path: '/dashboard-superadmin',
+        name: 'DashboardSuperAdmin',
+        component: () => import('@/views/DashboardSuperAdmin.vue'),
+        meta: { requiresAuth: true, role: 'SUPER_ADMIN' }
+      },
+      {
+        path: '/superadmin',
+        name: 'superadmin-dashboard',
+        component: SuperAdminDashboard,
+        meta: { requiresAuth: true, role: 'SUPER_ADMIN' }
+      },
+      {
+        path: '/dashboard-superadmin-wireframe',
+        name: 'DashboardSuperAdminWireframe',
+        component: DashboardSuperAdminWireframe,
+        meta: { requiresAuth: true, role: 'SUPER_ADMIN' }
+      },
     {
       path: '/admin',
       name: 'admin-dashboard', 
