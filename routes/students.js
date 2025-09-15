@@ -6,7 +6,7 @@ const crypto = require('crypto');
 const Joi = require('joi');
 const { Op } = require('sequelize');
 const { authenticateToken } = require('../middleware/auth');
-const { requireRole } = require('../middleware/roleCheck');
+const { checkRole } = require('../middleware/roleCheck');
 const { Student, PersonaAutoritzada, StudentDocument, StudentMedical, User, Tenant } = require('../models/associations');
 
 const router = express.Router();
@@ -165,7 +165,7 @@ const validateStudentAccess = async (req, res, next) => {
 // POST /api/students - Crear estudiant amb tutors
 router.post('/', 
   authenticateToken, 
-  requireRole(['admin', 'coordinador']), 
+  checkRole(['SUPER_ADMIN', 'ADMIN_CENTRE', 'COORDINADOR']), 
   async (req, res) => {
     try {
       const { error, value } = studentCreateSchema.validate(req.body);
@@ -294,7 +294,7 @@ router.get('/:studentId/complete',
 router.put('/:studentId/medical', 
   authenticateToken, 
   validateStudentAccess,
-  requireRole(['admin', 'coordinador']),
+  checkRole(['SUPER_ADMIN', 'ADMIN_CENTRE', 'COORDINADOR']),
   async (req, res) => {
     try {
       const { error, value } = medicalUpdateSchema.validate(req.body);
@@ -350,7 +350,7 @@ router.put('/:studentId/medical',
 router.post('/:studentId/documents', 
   authenticateToken, 
   validateStudentAccess,
-  requireRole(['admin', 'coordinador']),
+  checkRole(['SUPER_ADMIN', 'ADMIN_CENTRE', 'COORDINADOR', 'FAMILIA']),
   upload.single('document'),
   async (req, res) => {
     try {
@@ -434,7 +434,7 @@ router.post('/:studentId/documents',
 router.post('/:studentId/tutors', 
   authenticateToken, 
   validateStudentAccess,
-  requireRole(['admin', 'coordinador']),
+  checkRole(['SUPER_ADMIN', 'ADMIN_CENTRE', 'COORDINADOR']),
   async (req, res) => {
     try {
       const tutorSchema = Joi.object({
@@ -503,7 +503,7 @@ router.post('/:studentId/tutors',
 router.delete('/:studentId/tutors/:tutorId', 
   authenticateToken, 
   validateStudentAccess,
-  requireRole(['admin', 'coordinador']),
+  checkRole(['SUPER_ADMIN', 'ADMIN_CENTRE', 'COORDINADOR']),
   async (req, res) => {
     try {
       const tutor = await PersonaAutoritzada.findOne({

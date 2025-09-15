@@ -274,51 +274,23 @@
           ></textarea>
         </div>
 
-        <!-- Notificació d'èxit -->
-        <div v-if="showSuccessMessage" class="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm font-medium text-green-800">
-                {{ successMessage }}
-              </p>
-            </div>
-          </div>
-        </div>
-
         <!-- Botons d'Acció -->
-        <div class="flex justify-between items-center space-x-4">
-          <div class="text-sm text-gray-500">
-            <p>Les dades es guarden automàticament cada 30 segons</p>
-          </div>
-          <div class="flex space-x-4">
-            <button
-              type="button"
-              class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              @click="restoreFromLocalStorage"
-            >
-              Restaurar Draft
-            </button>
-            <button
-              @click="saveStudent"
-              type="button"
-              class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              :disabled="isLoading"
-            >
-              <span v-if="isLoading" class="flex items-center">
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Desant...
-              </span>
-              <span v-else>Desar Estudiant</span>
-            </button>
-          </div>
+        <div class="flex justify-end space-x-4">
+          <button
+            type="button"
+            class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+          >
+            Cancel·lar
+          </button>
+          <button
+            @click="saveStudent"
+            type="button"
+            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            :disabled="isLoading"
+          >
+            <span v-if="isLoading">Desant...</span>
+            <span v-else>Desar Estudiant</span>
+          </button>
         </div>
 
         <!-- Debug Info (temporal) -->
@@ -337,21 +309,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 import TutorManager from '@/components/TutorManager.vue'
 import MedicalDataForm from '@/components/MedicalDataForm.vue'
 import DocumentUpload from '@/components/DocumentUpload.vue'
 
 const router = useRouter()
-const authStore = useAuthStore()
 
 // États reactius
 const isLoading = ref(false)
 const showDebug = ref(true) // Per desenvolupament
-const showSuccessMessage = ref(false)
-const successMessage = ref('')
 
 // Dades de l'estudiant
 const student = reactive({
@@ -394,80 +362,6 @@ const documents = ref([])
 
 // Errors
 const errors = reactive({})
-
-// Pre-omplir dades del tutor autenticat
-onMounted(() => {
-  // Auto-save/restore des de localStorage
-  restoreFromLocalStorage()
-  
-  // Pre-omplir primer tutor amb dades de l'usuari autenticat
-  if (authStore.user && tutors.value.length === 0) {
-    const primaryTutor = {
-      nom: authStore.user.first_name || authStore.user.name || '',
-      cognoms: authStore.user.last_name || '',
-      dni_nie: authStore.user.dni_nie || '',
-      telefon_principal: authStore.user.phone || '',
-      telefon_secundari: '',
-      email: authStore.user.email || '',
-      relacio_familiar: 'tutor_legal',
-      prioritat_contacte: 1,
-      autoritzat_recollir: true,
-      autoritzat_decisio_medica: true,
-      observacions: 'Tutor principal (usuari autenticat)',
-      is_primary: true // Marcar com a tutor principal
-    }
-    
-    tutors.value.push(primaryTutor)
-  }
-  
-  // Auto-save cada 30 segons
-  setInterval(saveToLocalStorage, 30000)
-})
-
-// Auto-save al localStorage
-const saveToLocalStorage = () => {
-  const formData = {
-    student: student,
-    tutors: tutors.value,
-    medicalData: medicalData.value,
-    timestamp: new Date().toISOString()
-  }
-  localStorage.setItem('student_form_draft', JSON.stringify(formData))
-}
-
-// Restore des de localStorage
-const restoreFromLocalStorage = () => {
-  const saved = localStorage.getItem('student_form_draft')
-  if (saved) {
-    try {
-      const formData = JSON.parse(saved)
-      const savedTime = new Date(formData.timestamp)
-      const now = new Date()
-      
-      // Només restore si és menys de 24h antic
-      if (now - savedTime < 24 * 60 * 60 * 1000) {
-        if (confirm('S\'ha trobat un formulari guardat automàticament. Vols restaurar les dades?')) {
-          Object.assign(student, formData.student)
-          tutors.value = formData.tutors || []
-          medicalData.value = formData.medicalData || medicalData.value
-        }
-      } else {
-        // Eliminar dades antigues
-        localStorage.removeItem('student_form_draft')
-      }
-    } catch (error) {
-      console.error('Error restaurant dades:', error)
-    }
-  }
-}
-
-const showSuccessNotification = (message) => {
-  successMessage.value = message
-  showSuccessMessage.value = true
-  setTimeout(() => {
-    showSuccessMessage.value = false
-  }, 5000)
-}
 
 // Validació i desar estudiant
 const validateForm = () => {
@@ -557,12 +451,7 @@ const saveStudent = async () => {
     // Simulació de resposta exitosa
     await new Promise(resolve => setTimeout(resolve, 2000))
     
-    // Eliminar draft després de guardar
-    localStorage.removeItem('student_form_draft')
-    
-    showSuccessNotification('Estudiant creat correctament! Totes les dades han estat guardades.')
-    
-    // Opcional: navegar a la llista d'estudiants
+    alert('Estudiant creat correctament!')
     // router.push('/students')
     
   } catch (error) {

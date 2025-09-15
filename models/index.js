@@ -41,9 +41,12 @@ const resetDatabase = async () => {
   }
 };
 
-const associations = require('./associations');
-
 module.exports = {
-  ...associations,
-  sequelize
+  sequelize,
+  Tenant,
+  User,
+  Student,
+  StudentFamily,
+  syncDatabase,
+  resetDatabase
 };

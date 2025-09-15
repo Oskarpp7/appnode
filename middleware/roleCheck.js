@@ -119,6 +119,7 @@ const requireStudentAccess = async (req, res, next) => {
 
 module.exports = {
   requireRole,
+  checkRole: requireRole,
   requireFamilyAccess,
   requireStudentAccess
 };

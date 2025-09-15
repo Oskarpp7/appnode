@@ -1,7 +1,6 @@
 const express = require('express');
 const authRoutes = require('./auth');
 const studentsRoutes = require('./students');
-const attendanceRoutes = require('./attendance');
 const { authenticateToken } = require('../middleware/auth');
 const { tenantIsolation } = require('../middleware/tenant');
 
@@ -50,7 +49,6 @@ router.get('/tenant-info', (req, res) => {
 // router.use('/monitor', monitorRoutes);    // Dashboard monitor  
 // Routes de funcionalitats
 router.use('/students', studentsRoutes);   // Gestió estudiants avançada
-router.use('/attendance', attendanceRoutes); // Sistema d'assistència
 
 // TODO: Afegir més routes aquí quan siguin implementades
 // router.use('/admin', adminRoutes);        // Administració centre

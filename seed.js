@@ -38,12 +38,12 @@ const seedDatabase = async () => {
     const users = await Promise.all([
       // Super Admin
       User.create({
-        name: 'Super Admin Global',
-        email: 'superadmin@gestio-escolar.com',
-        password: 'super123',
+        name: 'Super Admin',
+        email: 'admin@gestio-escolar.com',
+        password: 'admin123',
         role: 'SUPER_ADMIN',
         tenant_id: demoTenant.id,
-        phone: '600000001'
+        phone: '600123456'
       }),
 
       // Admin del Centre
@@ -54,16 +54,6 @@ const seedDatabase = async () => {
         role: 'ADMIN_CENTRE',
         tenant_id: demoTenant.id,
         phone: '934567891'
-      }),
-
-      // Coordinador
-      User.create({
-        name: 'Coordinador Serveis',
-        email: 'coordinador@escola-demo.com',
-        password: 'coord123',
-        role: 'COORDINADOR', 
-        tenant_id: demoTenant.id,
-        phone: '600000003'
       }),
 
       // Monitor
