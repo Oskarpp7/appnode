@@ -1,3 +1,4 @@
+scripts/fix-passwords.sh
 # Dependencies
 node_modules/
 client/node_modules/
