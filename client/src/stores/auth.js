@@ -90,7 +90,7 @@ export const useAuthStore = defineStore('auth', {
       
       const roleRedirects = {
         'SUPER_ADMIN': '/superadmin',
-        'ADMIN_CENTRE': '/admin',
+        'ADMIN': '/admin',
         'COORDINADOR': '/coordinador', 
         'MONITOR': '/monitor',
         'FAMILIA': '/familia'

@@ -5,16 +5,16 @@
         <div class="flex justify-between h-16">
           <div class="flex items-center">
             <h1 class="text-xl font-semibold text-white">
-              🏫 Admin Centre Dashboard
+              � Admin Dashboard
             </h1>
           </div>
           <div class="flex items-center space-x-4">
             <span class="text-white text-sm">
-              Admin Centre (ADMIN_CENTRE)
+              Administrador (ADMIN)
             </span>
-            <router-link to="/login" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-3 py-1 rounded text-sm">
+            <button @click="logout" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-3 py-1 rounded text-sm">
               Sortir
-            </router-link>
+            </button>
           </div>
         </div>
       </div>
@@ -226,5 +226,14 @@
 </template>
 
 <script setup>
-// No dependencies needed for this version
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const logout = () => {
+  authStore.logout()
+  router.push('/login')
+}
 </script>

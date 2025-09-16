@@ -17,7 +17,7 @@
           <div class="ml-4 flex items-center gap-2">
             <span class="font-semibold text-gray-700">Super Admin</span>
             <span class="text-2xl">👤</span>
-            <button class="text-red-500 ml-2">Sortir</button>
+            <button @click="logout" class="text-red-500 ml-2">Sortir</button>
           </div>
         </div>
       </div>
@@ -87,7 +87,9 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import DashboardCard from '@/components/DashboardCard.vue'
 import ChartInscripcions from '@/components/ChartInscripcions.vue'
 import ChartIngressosServei from '@/components/ChartIngressosServei.vue'
@@ -98,18 +100,11 @@ import NotificationList from '@/components/NotificationList.vue'
 import QuickActionCard from '@/components/QuickActionCard.vue'
 import ConfigPanel from '@/components/ConfigPanel.vue'
 
-export default {
-  name: 'SuperAdminDashboard',
-  components: {
-    DashboardCard,
-    ChartInscripcions,
-    ChartIngressosServei,
-    SchoolList,
-    UserList,
-    LogList,
-    NotificationList,
-    QuickActionCard,
-    ConfigPanel
-  }
+const router = useRouter()
+const authStore = useAuthStore()
+
+const logout = () => {
+  authStore.logout()
+  router.push('/login')
 }
 </script>

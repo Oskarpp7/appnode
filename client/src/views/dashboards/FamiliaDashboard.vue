@@ -12,9 +12,9 @@
             <span class="text-white text-sm">
               Família (FAMILIA)
             </span>
-            <router-link to="/login" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-3 py-1 rounded text-sm">
+            <button @click="logout" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-3 py-1 rounded text-sm">
               Sortir
-            </router-link>
+            </button>
           </div>
         </div>
       </div>
@@ -168,5 +168,14 @@
 </template>
 
 <script setup>
-// No dependencies needed
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const logout = () => {
+  authStore.logout()
+  router.push('/login')
+}
 </script>

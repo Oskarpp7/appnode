@@ -2,7 +2,14 @@ import DashboardSuperAdminWireframe from '@/views/dashboards/DashboardSuperAdmin
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-// Importar components
+// Lazy routes amb code-splitting
+const ModernSuperAdmin = () => import('@/views/dashboards/ModernSuperAdminDashboardNew.vue')
+const ModernAdmin = () => import('@/views/dashboards/ModernAdminDashboardNew.vue')
+const ModernCoordinador = () => import('@/views/dashboards/ModernCoordinadorDashboardNew.vue')
+const ModernMonitor = () => import('@/views/dashboards/ModernMonitorDashboardNew.vue')
+const ModernFamilia = () => import('@/views/dashboards/ModernFamiliaDashboardNew.vue')
+
+// Imports estàtics antics (per compatibilitat)
 import Login from '@/views/LoginView.vue'
 import SuperAdminDashboard from '@/views/dashboards/SuperAdminDashboard.vue'
 import AdminDashboard from '@/views/dashboards/AdminDashboard.vue'
@@ -49,8 +56,8 @@ const router = createRouter({
       {
         path: '/superadmin',
         name: 'superadmin-dashboard',
-        component: ModernSuperAdminDashboard,
-        meta: { requiresAuth: true, role: 'SUPER_ADMIN' }
+        component: ModernSuperAdmin,
+        meta: { requiresAuth: true, roles: ['SUPER_ADMIN'] }
       },
       {
         path: '/superadmin-classic',
@@ -67,7 +74,7 @@ const router = createRouter({
     {
       path: '/admin',
       name: 'admin-dashboard', 
-      component: ModernAdminDashboard,
+      component: ModernAdmin,
       meta: { 
         requiresAuth: true,
         roles: ['ADMIN', 'SUPER_ADMIN']
@@ -85,7 +92,7 @@ const router = createRouter({
     {
       path: '/coordinador',
       name: 'coordinador-dashboard',
-      component: ModernCoordinadorDashboard,
+      component: ModernCoordinador,
       meta: { 
         requiresAuth: true,
         roles: ['COORDINADOR', 'ADMIN', 'SUPER_ADMIN']
@@ -103,7 +110,7 @@ const router = createRouter({
     {
       path: '/monitor',
       name: 'monitor-dashboard',
-      component: ModernMonitorDashboard,
+      component: ModernMonitor,
       meta: { 
         requiresAuth: true,
         roles: ['MONITOR', 'COORDINADOR', 'ADMIN', 'SUPER_ADMIN']
@@ -121,7 +128,7 @@ const router = createRouter({
     {
       path: '/familia',
       name: 'familia-dashboard',
-      component: ModernFamiliaDashboard,
+      component: ModernFamilia,
       meta: { 
         requiresAuth: true,
         roles: ['FAMILIA']

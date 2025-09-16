@@ -1,50 +1,109 @@
 
 <template>
-  <div class="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 via-white to-blue-300 animate-fade-in">
-    <div class="w-full max-w-md p-8 rounded-2xl shadow-2xl backdrop-blur-md bg-white/80 border border-blue-100 transition-all duration-500">
-      <div class="flex flex-col items-center mb-6">
-        <img src="/favicon.ico" alt="Logo" class="w-14 h-14 mb-2 drop-shadow-lg" />
-        <h2 class="text-3xl font-extrabold text-blue-900 tracking-tight text-center">Gestió Escolar</h2>
-        <p class="mt-2 text-center text-base text-blue-700">Accedeix al teu compte</p>
+  <div class="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+      <div class="flex justify-center">
+        <div class="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center">
+          <span class="text-white font-bold text-xl">GE</span>
+        </div>
       </div>
-      <div class="mb-4 p-3 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 rounded">
-        <strong>ATENCIÓ:</strong> Hi ha una errada de connexió amb el login de tots els rols excepte Admin Centre. Si persisteix, caldrà revisar la coherència entre emails, contrasenyes i tenant_slug al backend i frontend, o restaurar l'estat anterior.
-      </div>
-      <form class="space-y-6" @submit.prevent="handleLogin" aria-label="Formulari d'inici de sessió">
-        <div class="space-y-4">
-          <div class="relative">
-            <label for="email" class="block text-sm font-medium text-blue-800">Email</label>
-            <span class="absolute left-3 top-9 text-blue-400">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-            </span>
-            <input
-              id="email"
-              v-model="credentials.email"
-              name="email"
-              type="email"
-              required
-              autocomplete="username"
-              class="mt-1 block w-full pl-10 pr-3 py-2 border border-blue-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white/90 text-blue-900 placeholder-blue-300"
-              placeholder="El teu email"
-              aria-required="true"
-            />
+      <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-slate-900">
+        Gestió Escolar
+      </h2>
+      <p class="mt-2 text-center text-sm text-slate-600">
+        Selecciona el teu perfil per accedir
+      </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div class="card">
+        <div class="card-body space-y-4">
+          <!-- Botons d'accés ràpid -->
+          <button @click="quickLogin('admin@admin.com')" 
+                  class="w-full btn-primary justify-start gap-3">
+            <span class="w-2 h-2 bg-white rounded-full"></span>
+            Admin
+          </button>
+          
+          <button @click="quickLogin('superadmin@edutech.com')" 
+                  class="w-full btn-primary justify-start gap-3 bg-purple-600 hover:bg-purple-700">
+            <span class="w-2 h-2 bg-white rounded-full"></span>
+            Super Admin
+          </button>
+          
+          <button @click="quickLogin('coordinador@edutech.com')" 
+                  class="w-full btn-primary justify-start gap-3 bg-indigo-600 hover:bg-indigo-700">
+            <span class="w-2 h-2 bg-white rounded-full"></span>
+            Coordinador
+          </button>
+          
+          <button @click="quickLogin('monitor@edutech.com')" 
+                  class="w-full btn-primary justify-start gap-3 bg-amber-500 hover:bg-amber-600">
+            <span class="w-2 h-2 bg-white rounded-full"></span>
+            Monitor
+          </button>
+          
+          <button @click="quickLogin('familia@edutech.com')" 
+                  class="w-full btn-primary justify-start gap-3 bg-rose-500 hover:bg-rose-600">
+            <span class="w-2 h-2 bg-white rounded-full"></span>
+            Família
+          </button>
+          
+          <div v-if="isLoading" class="flex justify-center py-2">
+            <div class="w-4 h-4 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
           </div>
-          <div class="relative">
-            <label for="password" class="block text-sm font-medium text-blue-800">Contrasenya</label>
-            <span class="absolute left-3 top-9 text-blue-400">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.104.896-2 2-2s2 .896 2 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-            </span>
-            <input
-              id="password"
-              v-model="credentials.password"
-              name="password"
-              type="password"
-              required
-              autocomplete="current-password"
-              class="mt-1 block w-full pl-10 pr-3 py-2 border border-blue-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white/90 text-blue-900 placeholder-blue-300"
-              placeholder="La teva contrasenya"
-              aria-required="true"
-            />
+          
+          <div v-if="error" class="text-sm text-red-600 text-center bg-red-50 p-2 rounded-lg">
+            {{ error }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+            <script setup>
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+
+const auth = useAuthStore()
+const router = useRouter()
+
+const isLoading = ref(false)
+const error = ref('')
+
+async function quickLogin(email) {
+  if (isLoading.value) return
+  
+  isLoading.value = true
+  error.value = ''
+  
+  try {
+    await auth.login({
+      email,
+      password: 'password123',
+      tenant_slug: 'escola-demo'
+    })
+    
+    // Redirigir segons el rol
+    const roleRoutes = {
+      'SUPER_ADMIN': '/superadmin',
+      'ADMIN': '/admin', 
+      'COORDINADOR': '/coordinador',
+      'MONITOR': '/monitor',
+      'FAMILIA': '/familia'
+    }
+    
+    const route = roleRoutes[auth.user.role] || '/admin'
+    await router.push(route)
+    
+  } catch (err) {
+    error.value = err.message || 'Error d\'autenticació'
+  } finally {
+    isLoading.value = false
+  }
+}
+</script>
           </div>
         </div>
         <transition name="fade">
@@ -65,42 +124,20 @@
           </button>
         </div>
         <div class="text-xs text-blue-700 bg-blue-50 p-3 rounded mt-2">
-          <p class="font-medium">Credencials de prova (seed actual):</p>
-          <p><strong>Super Admin:</strong> admin@gestio-escolar.com / password123</p>
-          <p><strong>Admin Centre:</strong> admin@escola-demo.com / password123</p>
-          <p><strong>Monitor:</strong> monitor@escola-demo.com / password123</p>
-          <p><strong>Família:</strong> anna.garcia@email.com / password123</p>
+          <p class="font-medium">Credencials de prova:</p>
+          <p><strong>Super Admin:</strong> admin@gestioescolar.com / password123</p>
+          <p><strong>Admin:</strong> admin@admin.com / password123</p>
+          <p><strong>Coordinador:</strong> admin@edutech.com / password123</p>
+          <p><strong>Monitor:</strong> monitor@edutech.com / password123</p>
+          <p><strong>Família:</strong> familia@edutech.com / password123</p>
         </div>
         <!-- Botons d'autologin -->
         <div class="mt-2 grid grid-cols-2 gap-2">
-          <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-1 px-2 rounded shadow-sm" @click="autofill('admin@gestio-escolar.com','password123')">Super Admin</button>
-          <button type="button" class="bg-blue-600 hover:bg-blue-800 text-white text-xs font-bold py-1 px-2 rounded shadow-sm" @click="autofill('admin@escola-demo.com','password123')">Admin Centre</button>
-          <button type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white text-xs font-bold py-1 px-2 rounded shadow-sm" @click="autofill('monitor@escola-demo.com','password123')">Monitor</button>
-          <button type="button" class="bg-purple-500 hover:bg-purple-700 text-white text-xs font-bold py-1 px-2 rounded shadow-sm" @click="autofill('anna.garcia@email.com','password123')">Família</button>
-        </div>
-        <!-- Botons d'accés directe per debug -->
-        <div class="mt-4 space-y-2">
-          <h3 class="text-sm font-medium text-blue-700 text-center">🔧 Accés directe (desenvolupament)</h3>
-          <div class="grid grid-cols-2 gap-2">
-            <router-link to="/admin" class="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-1 px-2 rounded text-center shadow-sm">
-              🏢 Admin Centre
-            </router-link>
-            <router-link to="/admin-simple" class="bg-blue-600 hover:bg-blue-800 text-white text-xs font-bold py-1 px-2 rounded text-center shadow-sm">
-              🏢 Admin Simple
-            </router-link>
-            <router-link to="/coordinador" class="bg-green-500 hover:bg-green-700 text-white text-xs font-bold py-1 px-2 rounded text-center shadow-sm">
-              📋 Coordinador
-            </router-link>
-            <router-link to="/monitor" class="bg-yellow-500 hover:bg-yellow-700 text-white text-xs font-bold py-1 px-2 rounded text-center shadow-sm">
-              👨‍🏫 Monitor
-            </router-link>
-            <router-link to="/familia" class="bg-purple-500 hover:bg-purple-700 text-white text-xs font-bold py-1 px-2 rounded text-center shadow-sm">
-              👨‍👩‍👧‍👦 Família
-            </router-link>
-            <router-link to="/test" class="bg-gray-500 hover:bg-gray-700 text-white text-xs font-bold py-1 px-2 rounded text-center shadow-sm">
-              🧪 Test Form
-            </router-link>
-          </div>
+          <button type="button" class="bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-1 px-2 rounded shadow-sm" @click="autofill('admin@gestioescolar.com','password123')">Super Admin</button>
+          <button type="button" class="bg-blue-600 hover:bg-blue-800 text-white text-xs font-bold py-1 px-2 rounded shadow-sm" @click="autofill('admin@admin.com','password123')">Admin</button>
+          <button type="button" class="bg-green-500 hover:bg-green-700 text-white text-xs font-bold py-1 px-2 rounded shadow-sm" @click="autofill('admin@edutech.com','password123')">Coordinador</button>
+          <button type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white text-xs font-bold py-1 px-2 rounded shadow-sm" @click="autofill('monitor@edutech.com','password123')">Monitor</button>
+          <button type="button" class="bg-purple-500 hover:bg-purple-700 text-white text-xs font-bold py-1 px-2 rounded shadow-sm" @click="autofill('familia@edutech.com','password123')">Família</button>
         </div>
       </form>
       <footer class="mt-8 text-center text-xs text-blue-400">
