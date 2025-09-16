@@ -1,16 +1,35 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer components {
-  .app-container { @apply w-full max-w-none px-4 sm:px-6 lg:px-8; }
-  .card { @apply bg-white dark:bg-slate-900 rounded-xl shadow-soft border border-slate-100/70 dark:border-slate-800; }
-  .card-body { @apply p-5 sm:p-6; }
-  .btn { @apply inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500; }
-  .btn-primary { @apply btn text-white bg-primary-600 hover:bg-primary-700; padding:.625rem 1rem; }
-  .btn-ghost { @apply btn text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800; padding:.5rem .75rem; }
+  .card {
+    @apply bg-white rounded-xl shadow-lg border border-slate-200;
+  }
+  
+  .card-body {
+    @apply p-6;
+  }
+  
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg font-medium transition-colors px-4 py-2;
+  }
+  
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg font-medium transition-colors px-4 py-2 text-white bg-blue-600 hover:bg-blue-700;
+  }
+  
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+  
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg font-medium transition-colors px-4 py-2 text-slate-600 hover:bg-slate-100;
+  }
 }
 
 @layer utilities {
-  .grid-auto-cards { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .grid-auto-cards { 
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+  }
 }
