@@ -6,6 +6,11 @@ import { useAuthStore } from '@/stores/auth'
 import Login from '@/views/LoginView.vue'
 import SuperAdminDashboard from '@/views/dashboards/SuperAdminDashboard.vue'
 import AdminDashboard from '@/views/dashboards/AdminDashboard.vue'
+import ModernAdminDashboard from '@/views/dashboards/ModernAdminDashboard.vue'
+import ModernSuperAdminDashboard from '@/views/dashboards/ModernSuperAdminDashboard.vue'
+import ModernCoordinadorDashboard from '@/views/dashboards/ModernCoordinadorDashboard.vue'
+import ModernMonitorDashboard from '@/views/dashboards/ModernMonitorDashboard.vue'
+import ModernFamiliaDashboard from '@/views/dashboards/ModernFamiliaDashboard.vue'
 import CoordinadorDashboard from '@/views/dashboards/CoordinadorDashboard.vue'
 import MonitorDashboard from '@/views/dashboards/MonitorDashboard.vue'
 import FamiliaDashboard from '@/views/dashboards/FamiliaDashboard.vue'
@@ -44,6 +49,12 @@ const router = createRouter({
       {
         path: '/superadmin',
         name: 'superadmin-dashboard',
+        component: ModernSuperAdminDashboard,
+        meta: { requiresAuth: true, role: 'SUPER_ADMIN' }
+      },
+      {
+        path: '/superadmin-classic',
+        name: 'superadmin-dashboard-classic',
         component: SuperAdminDashboard,
         meta: { requiresAuth: true, role: 'SUPER_ADMIN' }
       },
@@ -56,33 +67,69 @@ const router = createRouter({
     {
       path: '/admin',
       name: 'admin-dashboard', 
+      component: ModernAdminDashboard,
+      meta: { 
+        requiresAuth: true,
+        roles: ['ADMIN', 'SUPER_ADMIN']
+      }
+    },
+    {
+      path: '/admin-classic',
+      name: 'admin-dashboard-classic', 
       component: AdminDashboard,
       meta: { 
         requiresAuth: true,
-        roles: ['ADMIN_CENTRE', 'SUPER_ADMIN']
+        roles: ['ADMIN', 'SUPER_ADMIN']
       }
     },
     {
       path: '/coordinador',
       name: 'coordinador-dashboard',
+      component: ModernCoordinadorDashboard,
+      meta: { 
+        requiresAuth: true,
+        roles: ['COORDINADOR', 'ADMIN', 'SUPER_ADMIN']
+      }
+    },
+    {
+      path: '/coordinador-classic',
+      name: 'coordinador-dashboard-classic',
       component: CoordinadorDashboard,
       meta: { 
         requiresAuth: true,
-        roles: ['COORDINADOR', 'ADMIN_CENTRE', 'SUPER_ADMIN']
+        roles: ['COORDINADOR', 'ADMIN', 'SUPER_ADMIN']
       }
     },
     {
       path: '/monitor',
       name: 'monitor-dashboard',
+      component: ModernMonitorDashboard,
+      meta: { 
+        requiresAuth: true,
+        roles: ['MONITOR', 'COORDINADOR', 'ADMIN', 'SUPER_ADMIN']
+      }
+    },
+    {
+      path: '/monitor-classic',
+      name: 'monitor-dashboard-classic',
       component: MonitorDashboard,
       meta: { 
         requiresAuth: true,
-        roles: ['MONITOR', 'COORDINADOR', 'ADMIN_CENTRE', 'SUPER_ADMIN']
+        roles: ['MONITOR', 'COORDINADOR', 'ADMIN', 'SUPER_ADMIN']
       }
     },
     {
       path: '/familia',
       name: 'familia-dashboard',
+      component: ModernFamiliaDashboard,
+      meta: { 
+        requiresAuth: true,
+        roles: ['FAMILIA']
+      }
+    },
+    {
+      path: '/familia-classic',
+      name: 'familia-dashboard-classic',
       component: FamiliaDashboard,
       meta: { 
         requiresAuth: true,
@@ -147,7 +194,7 @@ router.beforeEach(async (to, from, next) => {
 function getRoleBasedRedirect(role) {
   const roleRedirects = {
     'SUPER_ADMIN': '/superadmin',
-    'ADMIN_CENTRE': '/admin', 
+    'ADMIN': '/admin',
     'COORDINADOR': '/coordinador',
     'MONITOR': '/monitor',
     'FAMILIA': '/familia'

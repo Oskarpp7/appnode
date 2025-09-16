@@ -39,8 +39,8 @@ const seedDatabase = async () => {
       // Super Admin
       User.create({
         name: 'Super Admin',
-        email: 'admin@gestio-escolar.com',
-        password: 'admin123',
+        email: 'admin@gestioescolar.com',
+        password: 'password123',
         role: 'SUPER_ADMIN',
         tenant_id: demoTenant.id,
         phone: '600123456'
@@ -49,8 +49,8 @@ const seedDatabase = async () => {
       // Admin del Centre
       User.create({
         name: 'Maria Administradora',
-        email: 'admin@escola-demo.com',
-        password: 'admin123',
+        email: 'admin@edutech.com',
+        password: 'password123',
         role: 'ADMIN_CENTRE',
         tenant_id: demoTenant.id,
         phone: '934567891'
@@ -59,8 +59,8 @@ const seedDatabase = async () => {
       // Monitor
       User.create({
         name: 'Joan Monitor',
-        email: 'monitor@escola-demo.com',
-        password: 'monitor123',
+        email: 'monitor@edutech.com',
+        password: 'password123',
         role: 'MONITOR',
         tenant_id: demoTenant.id,
         phone: '600987654'
@@ -69,8 +69,8 @@ const seedDatabase = async () => {
       // Famílies
       User.create({
         name: 'Anna García',
-        email: 'anna.garcia@email.com',
-        password: 'familia123',
+        email: 'familia@edutech.com',
+        password: 'password123',
         role: 'FAMILIA',
         tenant_id: demoTenant.id,
         phone: '666111222'
@@ -78,8 +78,8 @@ const seedDatabase = async () => {
 
       User.create({
         name: 'Pere López',
-        email: 'pere.lopez@email.com',
-        password: 'familia123',
+        email: 'pere.lopez@edutech.com',
+        password: 'password123',
         role: 'FAMILIA',
         tenant_id: demoTenant.id,
         phone: '666333444'
@@ -87,8 +87,8 @@ const seedDatabase = async () => {
 
       User.create({
         name: 'Carla Martín',
-        email: 'carla.martin@email.com',
-        password: 'familia123',
+        email: 'carla.martin@edutech.com',
+        password: 'password123',
         role: 'FAMILIA',
         tenant_id: demoTenant.id,
         phone: '666555666'
